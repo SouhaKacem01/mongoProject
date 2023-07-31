@@ -1,20 +1,54 @@
-const { MongoClient } = require('mongodb');
+const express= require ('express');
+const app =express();
+const mongoose = require("mongoose");
 
-const uri = "mongodb+srv://souhakacem:Mina2018@SCluster.rxhbzeu.mongodb.net/?retryWrites=true&w=majority";
-const client = new MongoClient(uri);
+const uri =
+"mongodb+srv://souhakacem:Mina2018@scluster.rxhbzeu.mongodb.net/?retryWrites=true&w=majority"
+//  "mongodb+srv://<username>:<password>@<cluster-name>.frbqx.mongodb.net/<database-name>?retryWrites=true&w=majority";
 
-async function run() {
+async function connect() {
   try {
-    await client.connect();
-    const db = client.db('sample_mflix');
-    const collection = db.collection('movies');
-
-    // Find the first document in the collection
-    const first = await collection.findOne();
-    console.log(first);
-  } finally {
-    // Close the database connection when finished or an error occurs
-    await client.close();
+    await mongoose.connect(uri);
+    console.log("Connected to MongoDB");
+  } catch (error) {
+    console.error(error);
   }
 }
-run().catch(console.error);
+
+connect();
+/*
+app.get('/',(req,res) =>{
+    res.send('Hello World');
+})
+*/
+app.get('/api/courses',(req,res) =>{
+    res.send([1, 2, 3]);
+})
+
+app.get('/api/posts/:year/:month',(req,res) =>{
+    res.send(req.params.year);
+    
+})
+
+const notesSchema={
+    title : String,
+    content : String
+}
+
+const Note = mongoose.model("Note",notesSchema);
+app.get("/",(req,res) => {
+    res.sendFile(__dirname + "/index.html");
+})
+
+app.post("/", function(req,res){
+    let newNote = new Note ({
+        title : req.body.title,
+        content : req.body.content
+    })
+    newNote.save();
+    res.redirect('/');
+})
+
+
+const port = process.env.PORT || 3000;
+app.listen(port,()=>console.log(`listening on the port ${port}...`));
