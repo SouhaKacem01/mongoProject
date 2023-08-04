@@ -1,19 +1,34 @@
-const express  = require("express");
-const mongoose = require("mongoose");
-const uri = "mongodb+srv://souhakacem:Mina2018@scluster.rxhbzeu.mongodb.net/?retryWrites=true&w=majority";
-const app = express();
+const express = require('express');
+const mongoose = require('mongoose');
+const app= express();
+const ejs = require('ejs');
 
-async function connect() {
-  try {
-    await mongoose.connect(uri);
-    const db = mongoose.db('sample_mflix');
-    console.log("connected to mongodb");
-  }catch(error){
-    console.error(error);
-  }
+app.set('view engine','ejs');
+
+mongoose.connect('mongodb+srv://souhakacem:Mina2018@scluster.rxhbzeu.mongodb.net/moviesDB?retryWrites=true&w=majority');
+
+const moviesSchema={
+    title : String,
+    genre : String,
+    year : String
 }
-connect();
 
-app.listen(8000,() =>{
-    console.log("server started on 8000");
-});
+const Movie =mongoose.model('Movie',moviesSchema);
+
+app.get('/',(req,res)=>{
+    Movie.find({}).then (function( movies){
+        res.render ('index',{
+            moviesList : movies
+        })
+    })
+    
+    /*let name = 'Souha';
+
+    res.render('index', {
+        userName : name
+    })*/
+})
+
+app.listen(4000, function(){
+    console.log('server is running');
+})
