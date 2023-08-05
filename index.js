@@ -2,8 +2,11 @@ const express = require('express');
 const app = express();
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const ejs = require('ejs');
 
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.set('view engine', 'ejs');
 
 const uri = "mongodb+srv://souhakacem:Mina2018@scluster.rxhbzeu.mongodb.net/notesDB"
 //  "mongodb+srv://<username>:<password>@<cluster-name>.frbqx.mongodb.net/<database-name>?retryWrites=true&w=majority";
@@ -37,12 +40,36 @@ const notesSchema = {
     content: String
 }
 
-const Note = mongoose.model("Note", notesSchema);
+const Note = mongoose.model("myNote", notesSchema);
 
-app.get("/", function (req, res) {
-    res.sendFile(__dirname + "/index.html");
+app.get('/',(req,res)=>{
+    Note.find({}).then (function( notes){
+        res.render ('index',{
+            NotesList : notes
+        })
+    })
+    
+    /*let name = 'Souha';
+
+    res.render('index', {
+        userName : name
+    })*/
 })
 
+
+/*
+app.get("/", function (req, res) {
+    //res.sendFile(__dirname + "/index.html");
+    
+    Note.find({}).then (function(notes) {
+        res.render('index', {
+        NoteList : notes 
+    });
+})
+
+})
+
+*/
 app.post("/", function (req, res) {
     let newNote = new Note({
         title: req.body.title,
