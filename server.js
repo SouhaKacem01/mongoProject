@@ -1,34 +1,35 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const app= express();
-const ejs = require('ejs');
+const dotenv = require('dotenv');
+const morgan = require('morgan');
+const bodyparser = require("body-parser");
+const path = require('path');
 
-app.set('view engine','ejs');
+const connectDB = require('./connection');
 
-mongoose.connect('mongodb+srv://souhakacem:Mina2018@scluster.rxhbzeu.mongodb.net/moviesDB?retryWrites=true&w=majority');
+const app = express();
 
-const moviesSchema={
-    title : String,
-    genre : String,
-    year : String
-}
+dotenv.config( { path : 'config.env'} )
+const PORT = process.env.PORT || 8080
 
-const Movie =mongoose.model('Movie',moviesSchema);
+// log requests
+app.use(morgan('tiny'));
 
-app.get('/',(req,res)=>{
-    Movie.find({}).then (function( movies){
-        res.render ('index',{
-            moviesList : movies
-        })
-    })
-    
-    /*let name = 'Souha';
+// mongodb connection
+connectDB();
 
-    res.render('index', {
-        userName : name
-    })*/
-})
+// parse request to body-parser
+app.use(bodyparser.urlencoded({ extended : true}))
 
-app.listen(4000, function(){
-    console.log('server is running');
-})
+// set view engine
+app.set("view engine", "ejs")
+//app.set("views", path.resolve(__dirname, "views/ejs"))
+
+// load assets
+app.use('/css', express.static(path.resolve(__dirname, "assets/css")))
+app.use('/img', express.static(path.resolve(__dirname, "assets/img")))
+app.use('/js', express.static(path.resolve(__dirname, "assets/js")))
+
+// load routers
+app.use('/', require('./router'))
+
+app.listen(PORT, ()=> { console.log(`Server is running on http://localhost:${PORT}`)});

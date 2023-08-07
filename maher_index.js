@@ -1,11 +1,12 @@
 const express= require ("express");
 const app = express();
 const mongoose = require("mongoose");
-const allowMethods = require('allow-methods');
+//const allowMethods = require('allow-methods');
 const bodyParser =require("body-parser")
 
+app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true})) 
-app.use(allowMethods(['get', 'head', 'post']));
+//app.use(allowMethods(['get', 'head', 'post']));
 
 const uri =
 "mongodb+srv://souhakacem:Mina2018@scluster.rxhbzeu.mongodb.net/notesDB"
@@ -66,5 +67,5 @@ app.post("/", async(req,res) =>{
 
 const port = process.env.PORT || 3000;
 
-app.listen(port,()=>console.log(`listening on the port ${port}...`));
+app.listen(3000,()=>console.log(`listening on the port ${port}...`));
 
